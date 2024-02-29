@@ -76,4 +76,24 @@ public class UserService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
     }
   }
+
+
+
+  public User checkUser(User checkUser) throws ResponseStatusException{
+    checkUser.setToken(UUID.randomUUID().toString());
+    checkUser.setStatus(UserStatus.OFFLINE);
+
+    User userByUsername = userRepository.findByUsername(checkUser.getUsername());
+    User userByName = userRepository.findByName(checkUser.getName());
+
+    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+    if (userByUsername != null && userByName != null) {
+        return checkUser;
+    } else if (userByUsername != null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
+    }
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "are"));
+  }
 }
+
+
