@@ -86,7 +86,7 @@ public class UserService {
     User userByUsername = userRepository.findByUsername(checkUser.getUsername());
     User userByName = userRepository.findByName(checkUser.getName());
 
-    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+    String baseErrorMessage = "Wrong Username or Password";
     if (userByUsername != null && userByName != null) {
         return checkUser;
     } else if (userByUsername != null) {

@@ -56,7 +56,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/checkUser")
+    @PostMapping("/checkUser")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserGetDTO checkUser(@RequestBody UserPostDTO userPostDTO) {
