@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * User Controller
@@ -48,7 +49,6 @@ public class UserController {
     public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO) {
         // convert API user to internal representation
         User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-
         // create user
         User createdUser = userService.createUser(userInput);
         // convert internal representation of user back to API
@@ -62,8 +62,19 @@ public class UserController {
     public UserGetDTO checkUser(@RequestBody UserPostDTO userPostDTO) {
         // convert API user to internal representation
         User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-        //check if user exists maybe we have to catch the error here or something!!!!!!!
+        //check if user exists
         User user = userService.checkUser(userInput);
+        // convert internal representation of user back to API
+        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+    }
+
+
+    @GetMapping("/getUser/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserGetDTO getUser(@PathVariable Long id) {
+        //check if user exists
+        User user = userService.getUser(id);
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }

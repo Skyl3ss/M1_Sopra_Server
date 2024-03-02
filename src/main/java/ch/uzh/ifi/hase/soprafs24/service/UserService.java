@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -78,10 +79,8 @@ public class UserService {
   }
 
 
-
   public User checkUser(User checkUser) throws ResponseStatusException{
     checkUser.setToken(UUID.randomUUID().toString());
-    checkUser.setStatus(UserStatus.OFFLINE);
 
     User userByUsername = userRepository.findByUsername(checkUser.getUsername());
     User userByName = userRepository.findByName(checkUser.getName());
@@ -94,6 +93,12 @@ public class UserService {
     }
     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "are"));
   }
+
+    public User getUser(Long id) throws ResponseStatusException{
+            Optional<User> optionalUser = userRepository.findById(id);
+            return optionalUser.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + id));
+    }
+
 }
 
 
