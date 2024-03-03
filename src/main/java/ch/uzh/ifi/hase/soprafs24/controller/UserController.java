@@ -77,4 +77,14 @@ public class UserController {
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
+
+    @PutMapping("/status")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void changeStatus(@RequestBody UserPostDTO userPostDTO) {
+        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+        //change the status True=Online False=Offline
+        userService.changeStatus(userInput);
+    }
+
 }

@@ -77,6 +77,9 @@ public class UserService {
 
     String baseErrorMessage = "Wrong Username or Password";
       if (userByUsername != null && userByUsername.getPassword().equals(checkUser.getPassword())) {
+          //login user and set him to be online
+          userByUsername.setStatus(UserStatus.ONLINE);
+          changeStatus(userByUsername);
           return userByUsername; // Password matches, return the user
       } else {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong username or password");
@@ -88,6 +91,21 @@ public class UserService {
     return optionalUser.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + id));
     }
 
+
+
+  public void changeStatus(User user){
+    User userByToken = userRepository.findByToken(user.getToken());
+
+      // Update the status attribute
+      if (userByToken != null) {
+          userByToken.setStatus(user.getStatus());
+          // Save the updated user back to the database
+          userRepository.save(userByToken);
+      } else {
+          // Handle the case when user is not found
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User could not be found");
+      }
+    }
 
 }
 
