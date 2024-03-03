@@ -42,7 +42,8 @@ public class UserService {
 
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
+    newUser.setStatus(UserStatus.ONLINE);
+    newUser.setCreationDate();
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -65,39 +66,28 @@ public class UserService {
    */
   private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    User userByPassword = userRepository.findByPassword(userToBeCreated.getPassword());
 
-    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-    if (userByUsername != null && userByPassword != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          String.format(baseErrorMessage, "username and the Password", "are"));
-    } else if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
-    } else if (userByPassword != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
+    if (userByUsername != null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This username is already taken. Please choose another one");
     }
   }
-
-
-  public User checkUser(User checkUser) throws ResponseStatusException{
-    checkUser.setToken(UUID.randomUUID().toString());
-
+//this has some security concerns with the creation and checkability of the password take a later look at it
+  public User loginUser(User checkUser) throws ResponseStatusException{
     User userByUsername = userRepository.findByUsername(checkUser.getUsername());
-    User userByPassword = userRepository.findByPassword(checkUser.getPassword());
 
     String baseErrorMessage = "Wrong Username or Password";
-    if (userByUsername != null && userByPassword != null) {
-        return checkUser;
-    } else if (userByUsername != null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
-    }
-    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "are"));
+      if (userByUsername != null && userByUsername.getPassword().equals(checkUser.getPassword())) {
+          return userByUsername; // Password matches, return the user
+      } else {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong username or password");
+      }
   }
 
-    public User getUser(Long id) throws ResponseStatusException{
-            Optional<User> optionalUser = userRepository.findById(id);
-            return optionalUser.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + id));
+  public User getUser(Long id) throws ResponseStatusException{
+    Optional<User> optionalUser = userRepository.findById(id);
+    return optionalUser.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + id));
     }
+
 
 }
 
