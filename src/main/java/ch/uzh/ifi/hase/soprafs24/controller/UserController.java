@@ -67,8 +67,18 @@ public class UserController {
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
+    @PostMapping("/checkUser/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public boolean checkToken(@RequestBody UserPostDTO userPostDTO,@PathVariable Long id) {
+        // convert API user to internal representation
+        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+        //check if user exists
+        return userService.tokenCheck(userInput,id);
+    }
 
-    @GetMapping("/getUser/{id}")
+
+    @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserGetDTO getUser(@PathVariable Long id) {
@@ -82,9 +92,22 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void changeStatus(@RequestBody UserPostDTO userPostDTO) {
+        // convert API user to internal representation
         User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
         //change the status True=Online False=Offline
         userService.changeStatus(userInput);
+    }
+
+    @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserGetDTO changeUser(@RequestBody UserPostDTO userPostDTO) {
+        // convert API user to internal representation
+        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+        //check if user exists
+        User user = userService.changeUser(userInput);
+
+        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
 }

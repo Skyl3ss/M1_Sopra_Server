@@ -107,6 +107,31 @@ public class UserService {
       }
     }
 
+    public User changeUser(User user){
+      User userByToken = userRepository.findByToken(user.getToken());
+        // Update the status attribute
+        if (userByToken != null) {
+            userByToken.setBirthday(user.getBirthday());
+            userByToken.setUsername(user.getUsername());
+
+            // Save the updated user back to the database
+            userRepository.save(userByToken);
+            return userByToken;
+        } else {
+            // Handle the case when user is not found
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User could not be found: Userbytoken is null");
+        }
+    }
+
+    public boolean tokenCheck(User user,Long Id){
+      User userByToken = userRepository.findByToken(user.getToken());
+      if (userRepository.findById(Id).isPresent()) {
+          User userById = userRepository.findById(Id).get();
+          return userByToken != null && userByToken.getPassword().equals(userById.getPassword());
+      }
+          return false;
+    }
+
 }
 
 
