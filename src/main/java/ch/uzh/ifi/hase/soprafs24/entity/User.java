@@ -40,7 +40,7 @@ public class User implements Serializable {
   private UserStatus status;
 
   @Column(nullable = false)
-  private LocalDateTime creationDate;
+  private LocalDate creationDate;
 
   @Column(nullable = true)
   private LocalDate birthday;
@@ -85,12 +85,12 @@ public class User implements Serializable {
     this.status = status;
   }
 
-  public LocalDateTime getCreationDate() {
+  public LocalDate getCreationDate() {
         return creationDate;
     }
 
   public void setCreationDate() {
-        this.creationDate = LocalDateTime.now();
+        this.creationDate = LocalDate.now();
     }
 
   public LocalDate getBirthday() {

@@ -10,7 +10,7 @@ public class UserGetDTO {
   private Long id;
   private String username;
   private UserStatus status;
-  private LocalDateTime creationDate;
+  private LocalDate creationDate;
   private LocalDate birthday;
   private String token;
 
@@ -38,11 +38,11 @@ public class UserGetDTO {
     this.status = status;
   }
 
-  public LocalDateTime getCreationDate() {
+  public LocalDate getCreationDate() {
         return creationDate;
     }
 
-  public void setCreationDate(LocalDateTime creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
     }
 
