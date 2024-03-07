@@ -18,7 +18,7 @@ public class DTOMapperTest {
   public void testCreateUser_fromUserPostDTO_toUser_success() {
     // create UserPostDTO
     UserPostDTO userPostDTO = new UserPostDTO();
-    userPostDTO.setPassword("name");
+    userPostDTO.setPassword("password");
     userPostDTO.setUsername("username");
 
     // MAP -> Create user
@@ -33,7 +33,7 @@ public class DTOMapperTest {
   public void testGetUser_fromUser_toUserGetDTO_success() {
     // create User
     User user = new User();
-    user.setPassword("Firstname Lastname");
+    user.setPassword("password");
     user.setUsername("firstname@lastname");
     user.setStatus(UserStatus.OFFLINE);
     user.setToken("1");
@@ -43,7 +43,6 @@ public class DTOMapperTest {
 
     // check content
     assertEquals(user.getId(), userGetDTO.getId());
-    assertEquals(user.getPassword(), userGetDTO.getPassword());
     assertEquals(user.getUsername(), userGetDTO.getUsername());
     assertEquals(user.getStatus(), userGetDTO.getStatus());
   }
