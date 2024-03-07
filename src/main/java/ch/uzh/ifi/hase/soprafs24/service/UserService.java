@@ -40,6 +40,7 @@ public class UserService {
     return this.userRepository.findAll();
   }
 
+  //service call to create user
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.ONLINE);
@@ -64,14 +65,17 @@ public class UserService {
    * @throws org.springframework.web.server.ResponseStatusException
    * @see User
    */
+
+  //private call needed to check if username is already used before changing a existing or new username
   private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
 
     if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This username is already taken. Please choose another one");
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
     }
   }
-//this has some security concerns with the creation and checkability of the password take a later look at it
+
+  //service call to check if password matches the username given returns the logged-in user if successful
   public User loginUser(User checkUser) throws ResponseStatusException{
     User userByUsername = userRepository.findByUsername(checkUser.getUsername());
 
@@ -79,23 +83,21 @@ public class UserService {
       if (userByUsername != null && userByUsername.getPassword().equals(checkUser.getPassword())) {
           //login user and set him to be online
           userByUsername.setStatus(UserStatus.ONLINE);
-          changeStatus(userByUsername);
           return userByUsername; // Password matches, return the user
       } else {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong username or password");
       }
   }
 
+  //returns the user for the provided id if user doesn't exist raises 404
   public User getUser(Long id) throws ResponseStatusException{
     Optional<User> optionalUser = userRepository.findById(id);
     return optionalUser.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + id));
     }
 
-
-
+  //service call for changing the user status
   public void changeStatus(User user){
     User userByToken = userRepository.findByToken(user.getToken());
-
       // Update the status attribute
       if (userByToken != null) {
           userByToken.setStatus(user.getStatus());
@@ -107,22 +109,37 @@ public class UserService {
       }
     }
 
-    public User changeUser(User user){
-      User userByToken = userRepository.findByToken(user.getToken());
-        // Update the status attribute
-        if (userByToken != null) {
-            userByToken.setBirthday(user.getBirthday());
-            userByToken.setUsername(user.getUsername());
-
-            // Save the updated user back to the database
-            userRepository.save(userByToken);
-            return userByToken;
-        } else {
-            // Handle the case when user is not found
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User could not be found: Userbytoken is null");
-        }
+    // service call for changing all changeable properties of the user creationdate, token and id aren't allowed to be changed
+    public void changeUser(User user,Long id) throws IllegalAccessException {
+      if(tokenCheck(user,id)){
+          User userByToken = userRepository.findByToken(user.getToken());
+            // Update the status attribute
+            if (userByToken != null) {
+                if (!userByToken.isAttributeSameAs(user, "password") && user.getPassword() != null) {
+                    userByToken.setPassword(user.getPassword());
+                }
+                if (!userByToken.isAttributeSameAs(user, "username") && user.getUsername() != null) {
+                    checkIfUserExists(user);
+                    userByToken.setUsername(user.getUsername());
+                }
+                if (!userByToken.isAttributeSameAs(user, "status") && user.getStatus() != null) {
+                    userByToken.setStatus(user.getStatus());
+                }
+                if (!userByToken.isAttributeSameAs(user, "birthday") && user.getBirthday() != null) {
+                    userByToken.setBirthday(user.getBirthday());
+                }
+                // Save the updated user back to the database
+                userRepository.save(userByToken);
+            } else {
+                // Handle the case when user is not found
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found");
+            }
+      }else{
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be authenticated");
+      }
     }
 
+    //checks if token matches the id and returns boolean value if matches or not
     public boolean tokenCheck(User user,Long Id){
       User userByToken = userRepository.findByToken(user.getToken());
       if (userRepository.findById(Id).isPresent()) {

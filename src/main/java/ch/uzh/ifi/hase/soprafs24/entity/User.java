@@ -5,7 +5,8 @@ import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.lang.reflect.Field;
+import java.util.Objects;
 
 /**
  * Internal User Representation
@@ -44,6 +45,32 @@ public class User implements Serializable {
 
   @Column(nullable = true)
   private LocalDate birthday;
+
+  //allows to compare attributes with other classes
+  public boolean isAttributeSameAs(User other, String attributeName) throws IllegalAccessException {
+    // Get the field by name using reflection
+    Field field;
+    try {
+        field = this.getClass().getDeclaredField(attributeName);
+    } catch (NoSuchFieldException e) {
+        // Handle if attribute does not exist
+        return false;
+    }
+
+    // Make the field accessible (if it's private)
+    field.setAccessible(true);
+
+    // Get the value of the field for this user
+    Object thisValue = field.get(this);
+
+    // Get the value of the field for the other user
+    Object otherValue = field.get(other);
+
+    // Compare the values
+    return Objects.equals(thisValue, otherValue);
+    }
+
+
 
   public Long getId() {
     return id;
@@ -101,3 +128,5 @@ public class User implements Serializable {
         this.birthday = birthday;
     }
 }
+
+
