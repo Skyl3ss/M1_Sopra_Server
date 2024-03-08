@@ -47,6 +47,9 @@ public class UserService {
     newUser.setStatus(UserStatus.ONLINE);
     newUser.setCreationDate();
     checkIfUserExists(newUser);
+    if (newUser.getUsername().length() > 20){
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username too long");
+      }
     // saves the given entity but data is only persisted in the database once
     // flush() is called
     newUser = userRepository.save(newUser);
@@ -121,6 +124,9 @@ public class UserService {
                 }
                 if (!userByToken.isAttributeSameAs(user, "username") && user.getUsername() != null && !Objects.equals(user.getUsername(), "")) {
                     checkIfUserExists(user);
+                    if (user.getUsername().length() > 20){
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username too long");
+                    }
                     userByToken.setUsername(user.getUsername());
                 }
                 if (!userByToken.isAttributeSameAs(user, "status") && user.getStatus() != null) {
