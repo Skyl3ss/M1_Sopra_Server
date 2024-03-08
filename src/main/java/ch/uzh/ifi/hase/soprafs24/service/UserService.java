@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -115,17 +116,17 @@ public class UserService {
           User userByToken = userRepository.findByToken(user.getToken());
             // Update the status attribute
             if (userByToken != null) {
-                if (!userByToken.isAttributeSameAs(user, "password") && user.getPassword() != null) {
+                if (!userByToken.isAttributeSameAs(user, "password") && user.getPassword() != null && !Objects.equals(user.getPassword(), "")) {
                     userByToken.setPassword(user.getPassword());
                 }
-                if (!userByToken.isAttributeSameAs(user, "username") && user.getUsername() != null) {
+                if (!userByToken.isAttributeSameAs(user, "username") && user.getUsername() != null && !Objects.equals(user.getUsername(), "")) {
                     checkIfUserExists(user);
                     userByToken.setUsername(user.getUsername());
                 }
                 if (!userByToken.isAttributeSameAs(user, "status") && user.getStatus() != null) {
                     userByToken.setStatus(user.getStatus());
                 }
-                if (!userByToken.isAttributeSameAs(user, "birthday") && user.getBirthday() != null) {
+                if (!userByToken.isAttributeSameAs(user, "birthday")) {
                     userByToken.setBirthday(user.getBirthday());
                 }
                 // Save the updated user back to the database
