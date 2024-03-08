@@ -107,6 +107,7 @@ public class UserService {
           userByToken.setStatus(user.getStatus());
           // Save the updated user back to the database
           userRepository.save(userByToken);
+          userRepository.flush();
       } else {
           // Handle the case when user is not found
           throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User could not be found");
@@ -137,6 +138,7 @@ public class UserService {
                 }
                 // Save the updated user back to the database
                 userRepository.save(userByToken);
+                userRepository.flush();
             } else {
                 // Handle the case when user is not found
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found");
